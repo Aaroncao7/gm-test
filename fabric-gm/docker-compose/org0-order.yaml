@@ -1,0 +1,37 @@
+version: "2"
+
+networks:
+  fabric-ca:
+services:
+  orderer1-org0:
+    container_name: orderer1-org0
+    image: myfabric/fabric-orderer:2.2
+    environment:
+      - ORDERER_HOME=/tmp/hyperledger/orderer
+      - ORDERER_HOST=orderer1-org0
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=7050
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/tmp/hyperledger/orderer/orderer.genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=org0MSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/tmp/hyperledger/org0/orderer/msp
+      - ORDERER_GENERAL_TLS_ENABLED=false
+
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/tmp/hyperledger/org0/orderer/tls-msp/keystore/key.pem
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/tmp/hyperledger/org0/orderer/tls-msp/signcerts/cert.pem
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/tmp/hyperledger/org0/orderer/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem]
+
+      - ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR=1
+      - ORDERER_KAFKA_VERBOSE=true
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/tmp/hyperledger/org0/orderer/tls-msp/signcerts/cert.pem
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/tmp/hyperledger/org0/orderer/tls-msp/keystore/key.pem
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/tmp/hyperledger/org0/orderer/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem]
+
+      - ORDERER_GENERAL_LOGLEVEL=debug
+      - ORDERER_DEBUG_BROADCASTTRACEDIR=data/logs
+    volumes:
+      - /tmp/hyperledger/org0/orderer:/tmp/hyperledger/org0/orderer/
+      - /tmp/hyperledger/configtx/system-genesis-block/genesis.block:/tmp/hyperledger/orderer/orderer.genesis.block
+
+    networks:
+      - fabric-ca
