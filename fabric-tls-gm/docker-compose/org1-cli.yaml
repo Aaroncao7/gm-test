@@ -5,7 +5,7 @@ networks:
 services:
   cli-org1:
     container_name: cli-org1
-    image: myfabric/fabric-tools:2.2
+    image: myfabric/fabric-tools:latest
     tty: true
     stdin_open: true
     environment:

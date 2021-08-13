@@ -6,7 +6,7 @@ networks:
 services:
   peer2-org1:
     container_name: peer2-org1
-    image: myfabric/fabric-peer:2.2
+    image: myfabric/fabric-peer:latest
     environment:
       - CORE_PEER_ID=peer2-org1
       - CORE_PEER_ADDRESS=peer2-org1:7051

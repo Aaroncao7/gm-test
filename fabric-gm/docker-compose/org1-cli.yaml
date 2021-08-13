@@ -5,7 +5,7 @@ networks:
 services:
   cli-org1:
     container_name: cli-org1
-    image: hyperledger/fabric-tools:2.0.0
+    image: myfabric/fabric-tools:2.2
     tty: true
     stdin_open: true
     environment:
@@ -28,7 +28,7 @@ services:
       - /tmp/hyperledger/org2:/tmp/hyperledger/org2/
       - /tmp/hyperledger/org1/peer1/assets/chaincode:/opt/gopath/src/github.com/hyperledger/fabric-samples/chaincode
       - /tmp/hyperledger/org1/admin:/tmp/hyperledger/org1/admin
-      - /tmp/hyperledger/org0/orderer/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem:/tmp/hyperledger/org0/orderer/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
+      - /tmp/hyperledger/org0/orderer:/tmp/hyperledger/org0/orderer
       - /tmp/hyperledger/org1/peer1/tls-msp/tlscacerts:/tmp/hyperledger/org1/admin/msp/tlscacerts
       - /tmp/hyperledger/configtx/channel-artifacts:/tmp/hyperledger/configtx/channel-artifacts
     networks:

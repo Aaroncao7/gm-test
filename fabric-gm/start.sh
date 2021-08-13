@@ -57,10 +57,13 @@ fabric-ca-client enroll -d -u http://peer1-org1:peer1PW@0.0.0.0:7054 --tls.certf
 export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/org1/admin
 export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org1/peer1/assets/ca/org1-ca-cert.pem
 export FABRIC_CA_CLIENT_MSPDIR=msp
-fabric-ca-client enroll -d -u http://admin-org1:org1AdminPW@0.0.0.0:7054 --tls.certfiles /tmp/hyperledger/org1/peer1/assets/ca/org1-ca-cert.pem
+fabric-ca-client enroll -d -u http://admin-org1:org1AdminPW@0.0.0.0:7054 --id.attrs "hf.Registrar.Roles=client,hf.Registrar.Attributes=*,hf.Revoker=true,hf.GenCRL=true,admin=true:ecert,abac.init=true:ecert" --tls.certfiles /tmp/hyperledger/org1/peer1/assets/ca/org1-ca-cert.pem
 
 mkdir /tmp/hyperledger/org1/peer1/msp/admincerts
 cp /tmp/hyperledger/org1/admin/msp/signcerts/cert.pem /tmp/hyperledger/org1/peer1/msp/admincerts/org1-admin-cert.pem
+
+mkdir /tmp/hyperledger/org1/admin/msp/admincerts
+cp /tmp/hyperledger/org1/admin/msp/signcerts/cert.pem /tmp/hyperledger/org1/admin/msp/admincerts/org1-admin-cert.pem
 
 # 4.4启动peer节点
 # 到这里，已经配置好了一个节点，所以我们就可以启动这个节点了，当然在之后和orderer节点一起启动也可以，不过忙活了这么多，还是应该提前看到一下所做的工作的成果的！
@@ -85,10 +88,13 @@ export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org0/orderer/assets/ca/or
 export FABRIC_CA_CLIENT_MSPDIR=msp
 
 # 登录admin 用户获取msp
-fabric-ca-client enroll -d -u http://admin-org0:org0adminpw@0.0.0.0:7053 --tls.certfiles /tmp/hyperledger/org0/orderer/assets/ca/org0-ca-cert.pem
+fabric-ca-client enroll -d -u http://admin-org0:org0adminpw@0.0.0.0:7053 --id.attrs "hf.Registrar.Roles=client,hf.Registrar.Attributes=*,hf.Revoker=true,hf.GenCRL=true,admin=true:ecert,abac.init=true:ecert" --tls.certfiles /tmp/hyperledger/org0/orderer/assets/ca/org0-ca-cert.pem
 # 复制证书到admincerts文件夹:
 mkdir /tmp/hyperledger/org0/orderer/msp/admincerts
 cp /tmp/hyperledger/org0/admin/msp/signcerts/cert.pem /tmp/hyperledger/org0/orderer/msp/admincerts/orderer-admin-cert.pem
+
+mkdir /tmp/hyperledger/org0/admin/msp/admincerts
+cp /tmp/hyperledger/org0/admin/msp/signcerts/cert.pem /tmp/hyperledger/org0/admin/msp/admincerts/org0-admin-cert.pem
 
 
 # 证书都准备好了之后我们还需要在每个msp文件下添加一个config.yaml
@@ -108,7 +114,7 @@ cp /tmp/hyperledger/org0/admin/msp/signcerts/cert.pem /tmp/hyperledger/org0/orde
 #     Certificate: cacerts/0-0-0-0-7053.pem
 #     OrganizationalUnitIdentifier: orderer
 # 需要org0，org1 下所有msp目录下都添加。
-./config.sh
+# ./config.sh
 
 mkdir /tmp/hyperledger/configtx/ 
 mkdir -p /tmp/hyperledger/configtx/org0/msp
@@ -134,3 +140,15 @@ configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate /tmp/hyperledger/co
 
 echo '创世区块文件通&道信息生成后启动orderer节'
 docker-compose -f docker-compose/org0-order.yaml up -d
+
+docker-compose -f docker-compose/org1-cli.yaml up -d
+docker exec -it cli-org1 bash
+
+export CHANNEL_NAME=mychannel
+export ORDERER_CA=/tmp/hyperledger/org0/orderer/msp/admincerts/orderer-admin-cert.pem
+export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp
+cd /tmp/hyperledger/configtx
+
+# peer channel create -o orderer1-org0:7050 -c ${CHANNEL_NAME} --ordererTLSHostnameOverride orderer1-org0 -f ./channel-artifacts/${CHANNEL_NAME}.tx --outputBlock ./channel-artifacts/${CHANNEL_NAME}.block --tls --cafile ${ORDERER_CA}
+
+
