@@ -260,6 +260,7 @@ docker-compose -f docker-compose/org0-order.yaml up -d
 # 启动组织一的cli
 docker-compose -f docker-compose/org1-cli.yaml up -d
 
+
 # 8、创建&加入通道
 # -----------------------------cli-org1-------------------------------
 
@@ -285,24 +286,14 @@ docker-compose -f docker-compose/org1-cli.yaml up -d
 # peer channel update -o orderer1-org0:7050 --ordererTLSHostnameOverride orderer1-org0 -c $CHANNEL_NAME -f ./channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.tx --tls --cafile $ORDERER_CA
 
 # -----------------------------cli-org1-end-------------------------------
+# installChaincode
+# -----------------------------------------------
+# docker exec -it cli-org1 bash
+# cd /tmp/hyperledger/org1/peer1/assets/chaincode
+# export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp
 
-# -----------------------------cli-org2------------------------------------
-# docker exec -it cli-org2 bash
+# peer lifecycle chaincode install chaincodeTest.tar.gz
 
-# export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org2/admin/msp
 
-# export CORE_PEER_ADDRESS=peer1-org2:7051
-# peer channel join -b ./channel-artifacts/mychannel.block
 
-#  export CORE_PEER_ADDRESS=peer2-org2:7051
-#  peer channel join -b ./channel-artifacts/mychannel.block
-
-# cd /tmp/hyperledger/configtx
-
-# export CHANNEL_NAME=mychannel
-# export ORDERER_CA=/tmp/hyperledger/org0/orderer/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
-# export CORE_PEER_LOCALMSPID=org2MSP
-
-# peer channel update -o orderer1-org0:7050 --ordererTLSHostnameOverride orderer1-org0 -c $CHANNEL_NAME -f ./channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.tx --tls --cafile $ORDERER_CA
-
-# -----------------------------cli-org2-end-------------------------------
+# -----------------------------------------------
