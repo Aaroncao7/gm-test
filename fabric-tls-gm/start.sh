@@ -265,13 +265,13 @@ docker-compose -f docker-compose/org1-cli.yaml up -d
 
 # docker exec -it cli-org1 bash
 
-export CHANNEL_NAME=mychannel
-export ORDERER_CA=/tmp/hyperledger/org0/orderer/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
-export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp
+# export CHANNEL_NAME=mychannel
+# export ORDERER_CA=/tmp/hyperledger/org0/orderer/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
+# export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp
 
-cd /tmp/hyperledger/configtx
+# cd /tmp/hyperledger/configtx
 
-peer channel create -o orderer1-org0:7050 -c ${CHANNEL_NAME} --ordererTLSHostnameOverride orderer1-org0 -f ./channel-artifacts/${CHANNEL_NAME}.tx --outputBlock ./channel-artifacts/${CHANNEL_NAME}.block --tls --cafile ${ORDERER_CA}
+# peer channel create -o orderer1-org0:7050 -c ${CHANNEL_NAME} --ordererTLSHostnameOverride orderer1-org0 -f ./channel-artifacts/${CHANNEL_NAME}.tx --outputBlock ./channel-artifacts/${CHANNEL_NAME}.block --tls --cafile ${ORDERER_CA}
 
 
 # export CORE_PEER_ADDRESS=peer1-org1:7051
@@ -285,24 +285,16 @@ peer channel create -o orderer1-org0:7050 -c ${CHANNEL_NAME} --ordererTLSHostnam
 # peer channel update -o orderer1-org0:7050 --ordererTLSHostnameOverride orderer1-org0 -c $CHANNEL_NAME -f ./channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.tx --tls --cafile $ORDERER_CA
 
 # -----------------------------cli-org1-end-------------------------------
+# installChaincode
+# -----------------------------------------------
+# docker exec -it cli-org1 bash
+# cd /tmp/hyperledger/org1/peer1/assets/chaincode
+# export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp
 
-# -----------------------------cli-org2------------------------------------
-# docker exec -it cli-org2 bash
+# peer lifecycle chaincode install chaincodeTest.tar.gz
 
-# export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org2/admin/msp
 
-# export CORE_PEER_ADDRESS=peer1-org2:7051
-# peer channel join -b ./channel-artifacts/mychannel.block
+# cli-org2 的安装基本相同，自行登录cli-org2容器中安装
 
-#  export CORE_PEER_ADDRESS=peer2-org2:7051
-#  peer channel join -b ./channel-artifacts/mychannel.block
 
-# cd /tmp/hyperledger/configtx
-
-# export CHANNEL_NAME=mychannel
-# export ORDERER_CA=/tmp/hyperledger/org0/orderer/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
-# export CORE_PEER_LOCALMSPID=org2MSP
-
-# peer channel update -o orderer1-org0:7050 --ordererTLSHostnameOverride orderer1-org0 -c $CHANNEL_NAME -f ./channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.tx --tls --cafile $ORDERER_CA
-
-# -----------------------------cli-org2-end-------------------------------
+# -----------------------------------------------
