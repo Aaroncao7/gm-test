@@ -20,7 +20,7 @@
 
 mkdir /tmp/hyperledger
 sudo chmod  -R 777 /tmp/hyperledger
-sudo cp ./tlsbin/* /usr/local/bin/
+sudo cp ./gmbin/* /usr/local/bin/
 # 3
 docker-compose -f docker-compose/tls-ca.yaml  up -d
 sleep 1
@@ -33,16 +33,16 @@ sudo chmod  -R 777 /tmp/hyperledger/fabric-ca-tls
 # 设置环境变量&登陆
 export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/fabric-ca-tls/crypto/ca-cert.pem
 export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/fabric-ca-tls/admin
-fabric-ca-client enroll -d -u https://tls-ca-admin:tls-ca-adminpw@0.0.0.0:7052 --tls.certfiles /tmp/hyperledger/fabric-ca-tls/crypto/ca-cert.pem 
+./fabric-ca-client enroll -d -u https://tls-ca-admin:tls-ca-adminpw@0.0.0.0:7052 --tls.certfiles /tmp/hyperledger/fabric-ca-tls/crypto/ca-cert.pem 
  # 登陆成功后会在/tmp/hyperledger/fabric-ca-tls/目录下生车给你admin文件夹，这里面是 admin相关的证书文件，并且只有登陆了admin,才具有权限进行用户注册，因为该用户具有CA的全部权限，相当于CA服务的root用户。
 
-fabric-ca-client register -d --id.name peer1-org1 --id.secret peer1PW --id.type peer -u https://0.0.0.0:7052 --tls.certfiles /tmp/hyperledger/fabric-ca-tls/crypto/ca-cert.pem --home=/tmp/hyperledger/fabric-ca-tls/admin
+./fabric-ca-client register -d --id.name peer1-org1 --id.secret peer1PW --id.type peer -u https://0.0.0.0:7052 --tls.certfiles /tmp/hyperledger/fabric-ca-tls/crypto/ca-cert.pem --home=/tmp/hyperledger/fabric-ca-tls/admin
 
-fabric-ca-client register -d --id.name peer2-org1 --id.secret peer2PW --id.type peer -u https://0.0.0.0:7052 --tls.certfiles /tmp/hyperledger/fabric-ca-tls/crypto/ca-cert.pem --home=/tmp/hyperledger/fabric-ca-tls/admin
+./fabric-ca-client register -d --id.name peer2-org1 --id.secret peer2PW --id.type peer -u https://0.0.0.0:7052 --tls.certfiles /tmp/hyperledger/fabric-ca-tls/crypto/ca-cert.pem --home=/tmp/hyperledger/fabric-ca-tls/admin
 
-fabric-ca-client register -d --id.name orderer1-org0 --id.secret ordererPW --id.type orderer -u https://0.0.0.0:7052 --tls.certfiles /tmp/hyperledger/fabric-ca-tls/crypto/ca-cert.pem --home=/tmp/hyperledger/fabric-ca-tls/admin
+./fabric-ca-client register -d --id.name orderer1-org0 --id.secret ordererPW --id.type orderer -u https://0.0.0.0:7052 --tls.certfiles /tmp/hyperledger/fabric-ca-tls/crypto/ca-cert.pem --home=/tmp/hyperledger/fabric-ca-tls/admin
 
-fabric-ca-client register -d --id.name admin-org1 --id.secret org1AdminPW --id.type admin -u https://0.0.0.0:7052 --tls.certfiles /tmp/hyperledger/fabric-ca-tls/crypto/ca-cert.pem --home=/tmp/hyperledger/fabric-ca-tls/admin
+./fabric-ca-client register -d --id.name admin-org1 --id.secret org1AdminPW --id.type admin -u https://0.0.0.0:7052 --tls.certfiles /tmp/hyperledger/fabric-ca-tls/crypto/ca-cert.pem --home=/tmp/hyperledger/fabric-ca-tls/admin
 
 # 这里我们为各个节点注册TLS证书，之后Fabric网络的通信则需要通过这一步骤注册过的用户的TLS证书来进行TLS加密通信。
 # 到这里我们只是注册了各个节点的身份，还没有获取到他们的证书。证书可以通过登录获取，不过暂时不着急获取他们的TLS证书。
@@ -107,8 +107,9 @@ cp /tmp/hyperledger/fabric-ca-tls/crypto/ca-cert.pem  /tmp/hyperledger/org1/peer
 
 export FABRIC_CA_CLIENT_MSPDIR=tls-msp
 export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org1/peer1/assets/tls-ca/tls-ca-cert.pem
-
-fabric-ca-client enroll -d -u https://peer1-org1:peer1PW@0.0.0.0:7052 --enrollment.profile tls --csr.hosts peer1-org1 --tls.certfiles /tmp/hyperledger/org1/peer1/assets/tls-ca/tls-ca-cert.pem
+rm  /tmp/hyperledger/org1/peer1/fabric-ca-client-config.yaml
+./fabric-ca-client enroll -d -u https://peer1-org1:peer1PW@0.0.0.0:7052 --enrollment.profile tls --csr.hosts peer1-org1 --tls.certfiles /tmp/hyperledger/org1/peer1/assets/tls-ca/tls-ca-cert.pem
+rm  /tmp/hyperledger/org1/peer1/fabric-ca-client-config.yaml
 
 # 这一步完成后，在/tmp/hyperledger/org1/peer1下会出现一个tls-msp文件夹，这是peer1节点的TLS证书。
 # 修改秘钥文件名
@@ -116,30 +117,30 @@ fabric-ca-client enroll -d -u https://peer1-org1:peer1PW@0.0.0.0:7052 --enrollme
 mv /tmp/hyperledger/org1/peer1/tls-msp/keystore/*_sk /tmp/hyperledger/org1/peer1/tls-msp/keystore/key.pem
 
 
-# 4.2 peer2
-mkdir -p /tmp/hyperledger/org1/peer2/assets/ca/
-sudo chmod -R 777 /tmp/hyperledger/org1/peer2/assets/ca/
-cp /tmp/hyperledger/org1/ca/crypto/ca-cert.pem /tmp/hyperledger/org1/peer2/assets/ca/org1-ca-cert.pem
-export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/org1/peer2
-export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org1/peer2/assets/ca/org1-ca-cert.pem
-export FABRIC_CA_CLIENT_MSPDIR=msp
-fabric-ca-client enroll -d -u https://peer2-org1:peer2PW@0.0.0.0:7054 --tls.certfiles /tmp/hyperledger/org1/ca/crypto/ca-cert.pem 
+# # 4.2 peer2
+# mkdir -p /tmp/hyperledger/org1/peer2/assets/ca/
+# sudo chmod -R 777 /tmp/hyperledger/org1/peer2/assets/ca/
+# cp /tmp/hyperledger/org1/ca/crypto/ca-cert.pem /tmp/hyperledger/org1/peer2/assets/ca/org1-ca-cert.pem
+# export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/org1/peer2
+# export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org1/peer2/assets/ca/org1-ca-cert.pem
+# export FABRIC_CA_CLIENT_MSPDIR=msp
+# fabric-ca-client enroll -d -u https://peer2-org1:peer2PW@0.0.0.0:7054 --tls.certfiles /tmp/hyperledger/org1/ca/crypto/ca-cert.pem 
 
-# 这一步完成后在/tmp/hyperledger/org1/peer2下出现一个msp文件夹，这是peer2节点的msp证书。
+# # 这一步完成后在/tmp/hyperledger/org1/peer2下出现一个msp文件夹，这是peer2节点的msp证书。
 
-# 接下来是TLS证书
-mkdir -p /tmp/hyperledger/org1/peer2/assets/tls-ca/
-sudo chmod -R 777 /tmp/hyperledger/org1/peer2/assets/tls-ca/
-cp /tmp/hyperledger/fabric-ca-tls/crypto/ca-cert.pem  /tmp/hyperledger/org1/peer2/assets/tls-ca/tls-ca-cert.pem
+# # 接下来是TLS证书
+# mkdir -p /tmp/hyperledger/org1/peer2/assets/tls-ca/
+# sudo chmod -R 777 /tmp/hyperledger/org1/peer2/assets/tls-ca/
+# cp /tmp/hyperledger/fabric-ca-tls/crypto/ca-cert.pem  /tmp/hyperledger/org1/peer2/assets/tls-ca/tls-ca-cert.pem
 
 
-export FABRIC_CA_CLIENT_MSPDIR=tls-msp
-export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org1/peer2/assets/tls-ca/tls-ca-cert.pem
-# 登录peer2节点的TLS CA服务器上
-fabric-ca-client enroll -d -u https://peer2-org1:peer2PW@0.0.0.0:7052 --enrollment.profile tls --csr.hosts peer2-org1 --tls.certfiles /tmp/hyperledger/org1/peer2/assets/tls-ca/tls-ca-cert.pem
-# 这一步完成后，在/tmp/hyperledger/org1/peer2下会出现一个tls-msp文件夹，这是peer2节点的TLS证书。
-# 修改秘钥文件名
-mv /tmp/hyperledger/org1/peer2/tls-msp/keystore/*_sk /tmp/hyperledger/org1/peer2/tls-msp/keystore/key.pem
+# export FABRIC_CA_CLIENT_MSPDIR=tls-msp
+# export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org1/peer2/assets/tls-ca/tls-ca-cert.pem
+# # 登录peer2节点的TLS CA服务器上
+# fabric-ca-client enroll -d -u https://peer2-org1:peer2PW@0.0.0.0:7052 --enrollment.profile tls --csr.hosts peer2-org1 --tls.certfiles /tmp/hyperledger/org1/peer2/assets/tls-ca/tls-ca-cert.pem
+# # 这一步完成后，在/tmp/hyperledger/org1/peer2下会出现一个tls-msp文件夹，这是peer2节点的TLS证书。
+# # 修改秘钥文件名
+# mv /tmp/hyperledger/org1/peer2/tls-msp/keystore/*_sk /tmp/hyperledger/org1/peer2/tls-msp/keystore/key.pem
 
 # 4.3 admin
 export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/org1/admin
@@ -151,14 +152,16 @@ fabric-ca-client enroll -d -u https://admin-org1:org1AdminPW@0.0.0.0:7054 --tls.
 # 配置环境变量
 export FABRIC_CA_CLIENT_MSPDIR=tls-msp
 export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org1/peer1/assets/tls-ca/tls-ca-cert.pem
+rm  /tmp/hyperledger/org1/admin/fabric-ca-client-config.yaml
 
-fabric-ca-client enroll -d -u https://admin-org1:org1AdminPW@0.0.0.0:7052 --enrollment.profile tls --csr.hosts admin-org1 --tls.certfiles /tmp/hyperledger/org1/peer1/assets/tls-ca/tls-ca-cert.pem
+./fabric-ca-client enroll -d -u https://admin-org1:org1AdminPW@0.0.0.0:7052 --enrollment.profile tls --csr.hosts admin-org1 --tls.certfiles /tmp/hyperledger/org1/peer1/assets/tls-ca/tls-ca-cert.pem
+rm  /tmp/hyperledger/org1/admin/fabric-ca-client-config.yaml
 
 mkdir /tmp/hyperledger/org1/peer1/msp/admincerts
 cp /tmp/hyperledger/org1/admin/msp/signcerts/cert.pem /tmp/hyperledger/org1/peer1/msp/admincerts/org1-admin-cert.pem
 
-mkdir /tmp/hyperledger/org1/peer2/msp/admincerts
-cp /tmp/hyperledger/org1/admin/msp/signcerts/cert.pem /tmp/hyperledger/org1/peer2/msp/admincerts/org1-admin-cert.pem
+# mkdir /tmp/hyperledger/org1/peer2/msp/admincerts
+# cp /tmp/hyperledger/org1/admin/msp/signcerts/cert.pem /tmp/hyperledger/org1/peer2/msp/admincerts/org1-admin-cert.pem
 
 # 4.4启动peer节点
 # 到这里，已经配置好了一个节点，所以我们就可以启动这个节点了，当然在之后和orderer节点一起启动也可以，不过忙活了这么多，还是应该提前看到一下所做的工作的成果的！
@@ -166,8 +169,8 @@ cp /tmp/hyperledger/org1/admin/msp/signcerts/cert.pem /tmp/hyperledger/org1/peer
 # peer1节点
 docker-compose -f docker-compose/org1-peer1.yaml up -d
 sleep 1
-docker-compose -f docker-compose/org1-peer2.yaml up -d
-sleep 1
+# docker-compose -f docker-compose/org1-peer2.yaml up -d
+# sleep 1
 
 # 6.1 orderer
 mkdir -p /tmp/hyperledger/org0/orderer/assets/ca/
@@ -184,8 +187,10 @@ cp /tmp/hyperledger/fabric-ca-tls/crypto/ca-cert.pem  /tmp/hyperledger/org0/orde
 
 export FABRIC_CA_CLIENT_MSPDIR=tls-msp
 export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org0/orderer/assets/tls-ca/tls-ca-cert.pem
-fabric-ca-client enroll -d -u https://orderer1-org0:ordererPW@0.0.0.0:7052 --enrollment.profile tls --csr.hosts orderer1-org0 --tls.certfiles /tmp/hyperledger/org0/orderer/assets/tls-ca/tls-ca-cert.pem
+rm /tmp/hyperledger/org0/orderer/fabric-ca-client-config.yaml
+./fabric-ca-client enroll -d -u https://orderer1-org0:ordererPW@0.0.0.0:7052 --enrollment.profile tls --csr.hosts orderer1-org0 --tls.certfiles /tmp/hyperledger/org0/orderer/assets/tls-ca/tls-ca-cert.pem
 mv /tmp/hyperledger/org0/orderer/tls-msp/keystore/*_sk /tmp/hyperledger/org0/orderer/tls-msp/keystore/key.pem
+rm /tmp/hyperledger/org0/orderer/fabric-ca-client-config.yaml
 
 
 # 6.2 admin
@@ -216,7 +221,6 @@ cp /tmp/hyperledger/org0/admin/msp/signcerts/cert.pem /tmp/hyperledger/org0/orde
 #     Certificate: cacerts/0-0-0-0-7053.pem
 #     OrganizationalUnitIdentifier: orderer
 # 需要org0，org1, org2 下所有msp目录下都添加。
-
 ./config.sh
 
 path=`pwd`
@@ -265,13 +269,13 @@ docker-compose -f docker-compose/org1-cli.yaml up -d
 
 # docker exec -it cli-org1 bash
 
-# export CHANNEL_NAME=mychannel
-# export ORDERER_CA=/tmp/hyperledger/org0/orderer/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
-# export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp
+export CHANNEL_NAME=mychannel
+export ORDERER_CA=/tmp/hyperledger/org0/orderer/tls-msp/tlscacerts/tls-0-0-0-0-7052.pem
+export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp
 
-# cd /tmp/hyperledger/configtx
+cd /tmp/hyperledger/configtx
 
-# peer channel create -o orderer1-org0:7050 -c ${CHANNEL_NAME} --ordererTLSHostnameOverride orderer1-org0 -f ./channel-artifacts/${CHANNEL_NAME}.tx --outputBlock ./channel-artifacts/${CHANNEL_NAME}.block --tls --cafile ${ORDERER_CA}
+peer channel create -o orderer1-org0:7050 -c ${CHANNEL_NAME} --ordererTLSHostnameOverride orderer1-org0 -f ./channel-artifacts/${CHANNEL_NAME}.tx --outputBlock ./channel-artifacts/${CHANNEL_NAME}.block --tls --cafile ${ORDERER_CA}
 
 
 # export CORE_PEER_ADDRESS=peer1-org1:7051
@@ -298,3 +302,10 @@ docker-compose -f docker-compose/org1-cli.yaml up -d
 
 
 # -----------------------------------------------
+
+# configtxlator proto_decode --input mychannel.block.pd --type common.Block | jq .data.data[0].payload.data.config > mychannel.json
+configtxgen -profile TwoOrgsOrdererGenesis -channelID system-channel -outputBlock /tmp/hyperledger/configtx/system-genesis-block/genesis.block.pb -configPath /tmp/hyperledger/configtx/
+configtxlator proto_decode --input genesis.block.pb --type common.Block  > genesis2.json
+
+# configtxlator proto_decode --input genesis.block.pd --type common.Block | jq .data.data[0].payload.data.config > genesis.block.pd.json
+# peer channel fetch newest mychannel.block -c mychannel --orderer orderer.example.com:7050

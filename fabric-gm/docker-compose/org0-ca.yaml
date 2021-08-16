@@ -6,11 +6,11 @@ networks:
 services:
   org0:
     container_name: org0
-    image: myfabric/fabric-ca:amd64-1.4.3
+    image: myfabric/fabric-ca:amd64-1.4.10-snapshot-03a9a3a
     command: sh -c 'fabric-ca-server start -d -b org0-admin:org0-adminpw --port 7053'
     environment:
       - FABRIC_CA_SERVER_HOME=/tmp/hyperledger/fabric-ca/crypto
-      - FABRIC_CA_SERVER_TLS_ENABLED=false
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_CSR_CN=org0
       - FABRIC_CA_SERVER_CSR_HOSTS=0.0.0.0
       - FABRIC_CA_SERVER_PORT=7053

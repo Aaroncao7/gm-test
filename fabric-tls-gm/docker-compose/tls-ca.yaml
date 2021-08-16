@@ -5,7 +5,7 @@ networks:
 services:
   ca-tls:
     container_name: ca-tls
-    image: myfabric/fabric-ca:amd64-1.4.10-snapshot-03a9a3a
+    image: hyperledger/fabric-ca:1.5.0
     command: sh -c 'fabric-ca-server start -d -b tls-ca-admin:tls-ca-adminpw --port 7052'
     environment:
       - FABRIC_CA_SERVER_HOME=/tmp/hyperledger/fabric-ca/crypto

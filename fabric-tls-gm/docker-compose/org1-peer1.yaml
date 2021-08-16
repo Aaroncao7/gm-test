@@ -6,7 +6,7 @@ networks:
 services:
   peer1-org1:
     container_name: peer1-org1
-    image: myfabric/fabric-peer:latest
+    image: myfabric/fabric-peer:2.2.0
     environment:
       - CORE_PEER_ID=peer1-org1
       - CORE_PEER_ADDRESS=peer1-org1:7051
@@ -32,5 +32,7 @@ services:
     volumes:
       - /var/run:/host/var/run
       - /tmp/hyperledger/org1/peer1:/tmp/hyperledger/org1/peer1
+    extra_hosts:
+      - "orderer1-org0: 172.21.0.1"
     networks:
       - fabric-ca

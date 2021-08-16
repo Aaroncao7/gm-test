@@ -1,0 +1,30 @@
+version: "2"
+
+networks:
+  fabric-ca:
+services:
+  orderer:
+    container_name: orderer.demo.com
+    image: hyperledger/fabric-orderer:2.2.0
+    environment:
+      - ORDERER_GENERAL_LOGLEVEL=debug
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=7050
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+      - ORDERER_GENERAL_TLS_ENABLED=false
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    ports:
+      - "5050:7050"
+    volumes:
+      - ../artifacts:/var/hyperledger/configtx
+      - ../artifacts/orderer.genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ../crypto-config/ordererOrganizations/demo.com/orderers/orderer.demo.com/msp:/var/hyperledger/orderer/msp
+      - ../crypto-config/ordererOrganizations/demo.com/orderers/orderer.demo.com/tls:/var/hyperledger/orderer/tls
+    networks:
+      - fabric-ca

@@ -128,18 +128,18 @@ echo 'NodeOUs:
     Certificate: cacerts/0-0-0-0-7054.pem
     OrganizationalUnitIdentifier: orderer' > /tmp/hyperledger/org1/peer1/msp/config.yaml
 
-echo 'NodeOUs:
-  Enable: true
-  ClientOUIdentifier:
-    #修改对应的证书名称
-    Certificate: cacerts/0-0-0-0-7054.pem
-    OrganizationalUnitIdentifier: client
-  PeerOUIdentifier:
-    Certificate: cacerts/0-0-0-0-7054.pem
-    OrganizationalUnitIdentifier: peer
-  AdminOUIdentifier:
-    Certificate: cacerts/0-0-0-0-7054.pem
-    OrganizationalUnitIdentifier: admin
-  OrdererOUIdentifier:
-    Certificate: cacerts/0-0-0-0-7054.pem
-    OrganizationalUnitIdentifier: orderer' > /tmp/hyperledger/org1/peer2/msp/config.yaml
+# echo 'NodeOUs:
+#   Enable: true
+#   ClientOUIdentifier:
+#     #修改对应的证书名称
+#     Certificate: cacerts/0-0-0-0-7054.pem
+#     OrganizationalUnitIdentifier: client
+#   PeerOUIdentifier:
+#     Certificate: cacerts/0-0-0-0-7054.pem
+#     OrganizationalUnitIdentifier: peer
+#   AdminOUIdentifier:
+#     Certificate: cacerts/0-0-0-0-7054.pem
+#     OrganizationalUnitIdentifier: admin
+#   OrdererOUIdentifier:
+#     Certificate: cacerts/0-0-0-0-7054.pem
+#     OrganizationalUnitIdentifier: orderer' > /tmp/hyperledger/org1/peer2/msp/config.yaml
