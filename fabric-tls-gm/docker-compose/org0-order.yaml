@@ -5,7 +5,7 @@ networks:
 services:
   orderer1-org0:
     container_name: orderer1-org0
-    image: myfabric/fabric-orderer:latest
+    image: myfabric/fabric-orderer:2.2.0
     environment:
       - ORDERER_HOME=/tmp/hyperledger/orderer
       - ORDERER_HOST=orderer1-org0
@@ -32,6 +32,7 @@ services:
     volumes:
       - /tmp/hyperledger/org0/orderer:/tmp/hyperledger/org0/orderer/
       - /tmp/hyperledger/configtx/system-genesis-block/genesis.block:/tmp/hyperledger/orderer/orderer.genesis.block
-
+    ports:
+      - 7050:7050
     networks:
       - fabric-ca

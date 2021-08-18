@@ -46,13 +46,13 @@ export FABRIC_CA_CLIENT_MSPDIR=msp
 
 # 登陆peer1节点到org1 CA 服务器上
 # will create msp floder under /tmp/hyperledger/org1/peer1 
-./gmbin/fabric-ca-client enroll -d -u https://peer1-org1:peer1PW@0.0.0.0:7054
+fabric-ca-client enroll -d -u https://peer1-org1:peer1PW@0.0.0.0:7054 --tls.certfiles /tmp/hyperledger/org1/ca/crypto/ca-cert.pem
 
 # 4.3 admin
 export FABRIC_CA_CLIENT_HOME=/tmp/hyperledger/org1/admin
 export FABRIC_CA_CLIENT_TLS_CERTFILES=/tmp/hyperledger/org1/peer1/assets/ca/org1-ca-cert.pem
 export FABRIC_CA_CLIENT_MSPDIR=msp
-./gmbin/fabric-ca-client enroll -d -u https://admin-org1:org1AdminPW@0.0.0.0:7054 --id.attrs "hf.Registrar.Roles=client,hf.Registrar.Attributes=*,hf.Revoker=true,hf.GenCRL=true,admin=true:ecert,abac.init=true:ecert" --tls.certfiles /tmp/hyperledger/org1/peer1/assets/ca/org1-ca-cert.pem
+fabric-ca-client enroll -d -u https://admin-org1:org1AdminPW@0.0.0.0:7054 --id.attrs "hf.Registrar.Roles=client,hf.Registrar.Attributes=*,hf.Revoker=true,hf.GenCRL=true,admin=true:ecert,abac.init=true:ecert" --tls.certfiles /tmp/hyperledger/org1/peer1/assets/ca/org1-ca-cert.pem
 
 mkdir /tmp/hyperledger/org1/peer1/msp/admincerts
 cp /tmp/hyperledger/org1/admin/msp/signcerts/cert.pem /tmp/hyperledger/org1/peer1/msp/admincerts/org1-admin-cert.pem
@@ -137,13 +137,14 @@ echo '创世区块文件通&道信息生成后启动orderer节'
 docker-compose -f docker-compose/org0-order.yaml up -d
 
 docker-compose -f docker-compose/org1-cli.yaml up -d
-#docker exec -it cli-org1 bash
-#
+docker exec -it cli-org1 bash
+
 #export CHANNEL_NAME=mychannel
 #export ORDERER_CA=/tmp/hyperledger/org0/orderer/msp/admincerts/orderer-admin-cert.pem
 #export CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/admin/msp
 #cd /tmp/hyperledger/configtx
-#
-# peer channel create -o orderer1-org0:7050 -c ${CHANNEL_NAME} --ordererTLSHostnameOverride orderer1-org0 -f ./channel-artifacts/${CHANNEL_NAME}.tx --outputBlock ./channel-artifacts/${CHANNEL_NAME}.block --cafile ${ORDERER_CA}
+
+# peer channel create -o orderer1-org0:7050 -c ${CHANNEL_NAME} --ordererTLSHostnameOverride orderer1-org0 -f ./channel-artifacts/${CHANNEL_NAME}.tx --outputBlock ./channel-artifacts/${CHANNEL_NAME}.block --tls --cafile ${ORDERER_CA}
+
 
 
